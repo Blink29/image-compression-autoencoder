@@ -6,7 +6,7 @@ import cv2
 
 loader = DatasetLoader(
     dataset_path="dataset", 
-    image_size=(256, 256), 
+    image_size=(224, 224), 
     train_split=0.7, 
     test_split=0.2, 
     validation_split=0.1, 
@@ -18,7 +18,7 @@ test_loader = loader.test_image_loader()
 validation_loader = loader.validation_image_loader()
 
 model = AutoEncoder(
-    input_size=256*256*3, 
+    input_size=224*224*3, 
     hidden_size_1=1024, 
     hidden_size_2=512, 
     latent_size=500,
@@ -33,6 +33,8 @@ model = AutoEncoder(
 
 # model.plot_history()
 
-# model.test_model(test_loader)
+model.predict(test_loader)
 
-model.train(train_loader, validation_loader, epochs=50, batch_size=32)
+# model.test_model(validation_loader)
+
+# model.train(train_loader, validation_loader, epochs=25, batch_size=32)

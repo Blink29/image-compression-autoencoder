@@ -16,8 +16,8 @@ import matplotlib.pyplot as plt
 from numpy import asarray
 from tqdm import tqdm
 import shutil
-# from sklearn.metrics import mean_squared_error
-from util import mean_squared_error
+from sklearn.metrics import mean_squared_error
+# from util import mean_squared_error
 
 class AutoEncoder:
     def __init__(self, input_size, hidden_size_1, hidden_size_2, latent_size, model_path=None, history_path=None):
@@ -28,14 +28,22 @@ class AutoEncoder:
         self.model_path = model_path
         self.history_path = history_path
         self.history = []
-        self.autoencoder = self.create_model()
+        self.autoencoder = self.load_latest_model()
         
-        if model_path and os.path.exists(model_path):
-            self.autoencoder.load_weights(model_path)
+        # if model_path and os.path.exists(model_path):
+        #     self.autoencoder.load_weights(model_path)
         
         if history_path and os.path.exists(history_path):
             self.history = list(np.load(history_path))
 
+    def load_latest_model(self):
+        version = self.get_latest_version()
+        if version == 0:
+            return self.create_model()
+        autoencoder = self.create_model()
+        autoencoder.load_weights(f"models/model_v{version}.h5")
+        return autoencoder
+    
     def create_model(self):
         x = Input(shape=(self.input_size,))
         hidden_1 = Dense(self.hidden_size_1, activation='relu')(x)
@@ -109,7 +117,7 @@ class AutoEncoder:
         for i in range(n):
             # display original
             ax = plt.subplot(3, n, i+1)
-            plt.imshow(images[i].reshape(256, 256))
+            plt.imshow(images[i].reshape(224,224,3))
             plt.gray()
             ax.get_xaxis().set_visible(False)
             ax.get_yaxis().set_visible(False)
@@ -117,7 +125,7 @@ class AutoEncoder:
 
             # display reconstruction
             ax = plt.subplot(3, n, i+n+1)
-            plt.imshow(decoded_imgs[i].reshape(256, 256))
+            plt.imshow(decoded_imgs[i].reshape(224,224,3))
             plt.gray()
             ax.get_xaxis().set_visible(False)
             ax.get_yaxis().set_visible(False)
